@@ -1,0 +1,26 @@
+!pip install folium scikit-learn
+
+import folium
+from folium.plugins import HeatMap
+from sklearn.linear_model import LinearRegression
+
+m = folium.Map(location=[10.7626, 106.6822], zoom_start=12)
+areas = [
+    {"name":"Quận 1","coords":[10.7769,106.7009],"demand":[100,200,300]},
+    {"name":"Quận 3","coords":[10.7790,106.6900],"demand":[80,150,250]},
+    {"name":"Quận 5","coords":[10.7546,106.6636],"demand":[60,120,180]}
+]
+
+X,y=[],[]
+for i,a in enumerate(areas):
+    for t,d in enumerate(a["demand"]): # t=0 sáng,1 trưa,2 tối
+        X.append([i,t]); y.append(d)
+model=LinearRegression().fit(X,y)
+
+heat_data=[]
+for i,a in enumerate(areas):
+    pred=model.predict([[i,2]])[0]
+    heat_data.append([a["coords"][0],a["coords"][1],pred])
+
+HeatMap(heat_data,radius=25).add_to(m)
+m
